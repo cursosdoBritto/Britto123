@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -26,10 +26,14 @@ import {
   EyeOff,
   ChevronLeft,
   ChevronRight,
-  Zap
+  Zap,
+  Loader2
 } from "lucide-react";
-import { mockTemplates, mockColors, mockShapes, mockFonts, mockFilterEffects } from "../data/mockData";
+import { useTemplate } from "../hooks/useTemplates";
+import { useDesign } from "../hooks/useDesigns";
+import { FONTS, COLORS, SHAPES, FILTER_EFFECTS } from "../constants/designConstants";
 import { useToast } from "../hooks/use-toast";
+import { designsApi, exportApi } from "../services/api";
 
 const Editor = () => {
   const { templateId } = useParams();
