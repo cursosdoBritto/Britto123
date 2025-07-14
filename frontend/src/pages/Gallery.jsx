@@ -59,67 +59,101 @@ const Gallery = () => {
       }
     });
 
-  const DesignCard = ({ design }) => (
-    <Card className="group hover:shadow-2xl transition-all duration-300 border-0 bg-white overflow-hidden">
-      <div className="relative">
-        <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 relative overflow-hidden">
-          <img 
-            src={design.thumbnail} 
-            alt={design.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="flex space-x-2">
-              <Button size="sm" variant="secondary" className="bg-white/90 hover:bg-white flex-1">
-                <Eye className="w-4 h-4 mr-1" />
-                Visualizar
-              </Button>
-              <Link to={`/editor/${design.id}`} className="flex-1">
-                <Button size="sm" className="w-full bg-purple-600 hover:bg-purple-700">
-                  <Edit3 className="w-4 h-4 mr-1" />
-                  Editar
+  const DesignCard = ({ design }) => {
+    const handleDelete = async () => {
+      try {
+        await deleteDesign(design.id);
+      } catch (error) {
+        console.error("Error deleting design:", error);
+      }
+    };
+
+    const handleToggleFavorite = async () => {
+      try {
+        await toggleFavorite(design.id);
+      } catch (error) {
+        console.error("Error toggling favorite:", error);
+      }
+    };
+
+    return (
+      <Card className="group hover:shadow-2xl transition-all duration-300 border-0 bg-white overflow-hidden">
+        <div className="relative">
+          <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 relative overflow-hidden">
+            {design.thumbnail ? (
+              <img 
+                src={design.thumbnail} 
+                alt={design.name}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-400">
+                <FileText className="w-16 h-16" />
+              </div>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="flex space-x-2">
+                <Button size="sm" variant="secondary" className="bg-white/90 hover:bg-white flex-1">
+                  <Eye className="w-4 h-4 mr-1" />
+                  Visualizar
                 </Button>
-              </Link>
-              <Button size="sm" variant="secondary" className="bg-white/90 hover:bg-white">
-                <Download className="w-4 h-4" />
+                <Link to={`/editor/${design.id}`} className="flex-1">
+                  <Button size="sm" className="w-full bg-purple-600 hover:bg-purple-700">
+                    <Edit3 className="w-4 h-4 mr-1" />
+                    Editar
+                  </Button>
+                </Link>
+                <Button size="sm" variant="secondary" className="bg-white/90 hover:bg-white">
+                  <Download className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+          <div className="absolute top-3 right-3 flex space-x-2">
+            <Badge variant="secondary" className="bg-white/90 text-gray-800">
+              {design.templateName || "Personalizado"}
+            </Badge>
+          </div>
+        </div>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg group-hover:text-purple-600 transition-colors">
+              {design.name}
+            </CardTitle>
+            <div className="flex items-center space-x-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-8 w-8 p-0"
+                onClick={handleToggleFavorite}
+              >
+                <Star className={`w-4 h-4 ${design.isFavorite ? 'text-yellow-400 fill-current' : 'text-gray-400 hover:text-yellow-400'}`} />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-8 w-8 p-0"
+                onClick={handleDelete}
+              >
+                <Trash2 className="w-4 h-4 text-gray-400 hover:text-red-500" />
               </Button>
             </div>
           </div>
-        </div>
-        <div className="absolute top-3 right-3 flex space-x-2">
-          <Badge variant="secondary" className="bg-white/90 text-gray-800">
-            {design.template}
-          </Badge>
-        </div>
-      </div>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg group-hover:text-purple-600 transition-colors">
-            {design.name}
-          </CardTitle>
-          <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <Star className="w-4 h-4 text-gray-400 hover:text-yellow-400" />
-            </Button>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <Trash2 className="w-4 h-4 text-gray-400 hover:text-red-500" />
-            </Button>
-          </div>
-        </div>
-        <CardDescription className="text-gray-600 flex items-center space-x-4">
-          <div className="flex items-center space-x-1">
-            <Clock className="w-4 h-4" />
-            <span className="text-sm">{formatDate(design.lastModified)}</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <Calendar className="w-4 h-4" />
-            <span className="text-sm">{formatDate(design.createdAt)}</span>
-          </div>
-        </CardDescription>
-      </CardHeader>
-    </Card>
-  );
+          <CardDescription className="text-gray-600 flex items-center space-x-4">
+            <div className="flex items-center space-x-1">
+              <Clock className="w-4 h-4" />
+              <span className="text-sm">{formatDate(design.updatedAt)}</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <Calendar className="w-4 h-4" />
+              <span className="text-sm">{formatDate(design.createdAt)}</span>
+            </div>
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  };
 
   const EmptyState = () => (
     <div className="text-center py-12">
