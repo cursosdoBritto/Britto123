@@ -22,16 +22,22 @@ const Templates = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [viewMode, setViewMode] = useState("grid");
 
+  // Use API hook instead of mock data
+  const { templates, loading, error } = useTemplates({
+    search: searchTerm || undefined,
+    category: selectedCategory !== "all" ? selectedCategory : undefined
+  });
+
   const categories = [
-    { id: "all", name: "Todos", count: mockTemplates.length },
-    { id: "social", name: "Redes Sociais", count: mockTemplates.filter(t => t.category === "social").length },
-    { id: "web", name: "Web Banners", count: mockTemplates.filter(t => t.category === "web").length },
-    { id: "print", name: "Impressão", count: mockTemplates.filter(t => t.category === "print").length },
-    { id: "marketing", name: "Marketing", count: mockTemplates.filter(t => t.category === "marketing").length }
+    { id: "all", name: "Todos", count: templates.length },
+    { id: "social", name: "Redes Sociais", count: templates.filter(t => t.category === "social").length },
+    { id: "web", name: "Web Banners", count: templates.filter(t => t.category === "web").length },
+    { id: "print", name: "Impressão", count: templates.filter(t => t.category === "print").length },
+    { id: "marketing", name: "Marketing", count: templates.filter(t => t.category === "marketing").length }
   ];
 
-  const filteredTemplates = mockTemplates.filter(template => {
-    const matchesSearch = template.name.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredTemplates = templates.filter(template => {
+    const matchesSearch = searchTerm === "" || template.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "all" || template.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
