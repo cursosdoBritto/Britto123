@@ -12,9 +12,10 @@ import {
   Eye, 
   Edit3,
   Star,
-  Zap
+  Zap,
+  Loader2
 } from "lucide-react";
-import { mockTemplates } from "../data/mockData";
+import { useTemplates } from "../hooks/useTemplates";
 
 const Templates = () => {
   const [searchTerm, setSearchTerm] = useState("");
