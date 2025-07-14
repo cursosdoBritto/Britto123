@@ -17,9 +17,10 @@ import {
   Clock,
   Plus,
   Calendar,
-  FileText
+  FileText,
+  Loader2
 } from "lucide-react";
-import { mockDesigns } from "../data/mockData";
+import { useDesigns } from "../hooks/useDesigns";
 
 const Gallery = () => {
   const [searchTerm, setSearchTerm] = useState("");
