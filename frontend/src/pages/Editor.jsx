@@ -188,18 +188,79 @@ const Editor = () => {
     setSelectedElement(newElement);
   };
 
-  const saveDesign = () => {
-    toast({
-      title: "Design Salvo!",
-      description: "Seu design foi salvo com sucesso.",
-    });
+  const saveDesign = async () => {
+    if (!currentDesign) return;
+    
+    setIsSaving(true);
+    try {
+      const designData = {
+        name: currentDesign.name,
+        elements: canvasElements,
+        dimensions: currentDesign.dimensions,
+        templateId: currentDesign.templateId,
+        templateName: currentDesign.templateName,
+        userId: currentDesign.userId
+      };
+
+      if (currentDesign.id) {
+        // Update existing design
+        await updateDesign(designData);
+      } else {
+        // Create new design
+        const newDesign = await designsApi.create(designData);
+        setCurrentDesign(newDesign);
+        // Update URL to show design ID
+        navigate(`/editor/${newDesign.id}`, { replace: true });
+      }
+
+      toast({
+        title: "Design Salvo!",
+        description: "Seu design foi salvo com sucesso.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao salvar",
+        description: "Não foi possível salvar seu design. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const exportDesign = () => {
-    toast({
-      title: "Exportando...",
-      description: "Seu design está sendo exportado como PNG.",
-    });
+  const exportDesign = async () => {
+    if (!currentDesign?.id) {
+      toast({
+        title: "Erro",
+        description: "Salve o design antes de exportar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsExporting(true);
+    try {
+      const result = await exportApi.exportDesignBase64(currentDesign.id, 'png');
+      
+      // Create download link
+      const link = document.createElement('a');
+      link.href = `data:image/png;base64,${result.base64}`;
+      link.download = `${currentDesign.name}.png`;
+      link.click();
+
+      toast({
+        title: "Exportado!",
+        description: "Seu design foi exportado com sucesso.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao exportar",
+        description: "Não foi possível exportar seu design. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const renderCanvasElement = (element) => {
