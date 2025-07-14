@@ -259,7 +259,25 @@ const Gallery = () => {
       {/* Gallery Content */}
       <section className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {filteredDesigns.length === 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+              <span className="ml-2 text-gray-600">Carregando designs...</span>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <div className="text-red-500 text-4xl mb-4">⚠️</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Erro ao carregar designs
+              </h3>
+              <p className="text-gray-600 mb-6">
+                {error}
+              </p>
+              <Button onClick={() => window.location.reload()}>
+                Tentar Novamente
+              </Button>
+            </div>
+          ) : filteredDesigns.length === 0 ? (
             searchTerm ? (
               <div className="text-center py-12">
                 <div className="text-gray-400 text-4xl mb-4">🔍</div>
