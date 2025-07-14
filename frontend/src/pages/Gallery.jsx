@@ -27,6 +27,12 @@ const Gallery = () => {
   const [sortBy, setSortBy] = useState("recent");
   const [viewMode, setViewMode] = useState("grid");
 
+  // Use API hook instead of mock data
+  const { designs, loading, error, deleteDesign, toggleFavorite } = useDesigns({
+    search: searchTerm || undefined,
+    user_id: "user_1" // TODO: Get from auth context
+  });
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
       year: 'numeric',
@@ -35,17 +41,17 @@ const Gallery = () => {
     });
   };
 
-  const filteredDesigns = mockDesigns
+  const filteredDesigns = designs
     .filter(design => 
       design.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      design.template.toLowerCase().includes(searchTerm.toLowerCase())
+      (design.templateName && design.templateName.toLowerCase().includes(searchTerm.toLowerCase()))
     )
     .sort((a, b) => {
       switch (sortBy) {
         case "recent":
-          return new Date(b.lastModified) - new Date(a.lastModified);
+          return new Date(b.updatedAt) - new Date(a.updatedAt);
         case "oldest":
-          return new Date(a.lastModified) - new Date(b.lastModified);
+          return new Date(a.updatedAt) - new Date(b.updatedAt);
         case "name":
           return a.name.localeCompare(b.name);
         default:
