@@ -37,10 +37,12 @@ import { designsApi, exportApi } from "../services/api";
 
 const Editor = () => {
   const { templateId } = useParams();
+  const navigate = useNavigate();
   const canvasRef = useRef(null);
   const { toast } = useToast();
   
-  const [currentTemplate, setCurrentTemplate] = useState(null);
+  // State for current design
+  const [currentDesign, setCurrentDesign] = useState(null);
   const [selectedElement, setSelectedElement] = useState(null);
   const [canvasElements, setCanvasElements] = useState([]);
   const [history, setHistory] = useState([]);
@@ -48,34 +50,57 @@ const Editor = () => {
   const [zoom, setZoom] = useState(100);
   const [showGrid, setShowGrid] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+
+  // API hooks
+  const { template, loading: templateLoading } = useTemplate(templateId);
+  const { design, loading: designLoading, updateDesign } = useDesign(templateId);
 
   useEffect(() => {
-    if (templateId) {
-      const template = mockTemplates.find(t => t.id === parseInt(templateId));
-      if (template) {
-        setCurrentTemplate(template);
-        setCanvasElements(template.elements || []);
-        addToHistory(template.elements || []);
-      }
-    } else {
-      // Tela em branco
-      const blankTemplate = {
-        id: 0,
-        name: "Tela em Branco",
+    if (templateId && template) {
+      // Loading from template
+      const newDesign = {
+        name: `Novo Design - ${template.name}`,
+        templateId: template.id,
+        templateName: template.name,
+        dimensions: template.dimensions,
+        elements: template.elements || [],
+        userId: "user_1" // TODO: Get from auth context
+      };
+      setCurrentDesign(newDesign);
+      setCanvasElements(template.elements || []);
+      addToHistory(template.elements || []);
+    } else if (templateId && design) {
+      // Loading existing design
+      setCurrentDesign(design);
+      setCanvasElements(design.elements || []);
+      addToHistory(design.elements || []);
+    } else if (!templateId) {
+      // Blank canvas
+      const blankDesign = {
+        name: "Novo Design",
         dimensions: { width: 1200, height: 800 },
         elements: [
           {
             id: "bg0",
             type: "background",
-            color: "#FFFFFF"
+            color: "#FFFFFF",
+            x: 0,
+            y: 0,
+            width: 1200,
+            height: 800,
+            zIndex: 0,
+            visible: true
           }
-        ]
+        ],
+        userId: "user_1"
       };
-      setCurrentTemplate(blankTemplate);
-      setCanvasElements(blankTemplate.elements);
-      addToHistory(blankTemplate.elements);
+      setCurrentDesign(blankDesign);
+      setCanvasElements(blankDesign.elements);
+      addToHistory(blankDesign.elements);
     }
-  }, [templateId]);
+  }, [templateId, template, design]);
 
   const addToHistory = (elements) => {
     const newHistory = history.slice(0, historyIndex + 1);
