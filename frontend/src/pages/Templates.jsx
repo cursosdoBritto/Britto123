@@ -177,17 +177,37 @@ const Templates = () => {
             </p>
           </div>
 
-          <div className={`grid gap-6 ${
-            viewMode === "grid" 
-              ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" 
-              : "grid-cols-1 lg:grid-cols-2"
-          }`}>
-            {filteredTemplates.map((template) => (
-              <TemplateCard key={template.id} template={template} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+              <span className="ml-2 text-gray-600">Carregando templates...</span>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <div className="text-red-500 text-4xl mb-4">⚠️</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Erro ao carregar templates
+              </h3>
+              <p className="text-gray-600 mb-6">
+                {error}
+              </p>
+              <Button onClick={() => window.location.reload()}>
+                Tentar Novamente
+              </Button>
+            </div>
+          ) : (
+            <div className={`grid gap-6 ${
+              viewMode === "grid" 
+                ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" 
+                : "grid-cols-1 lg:grid-cols-2"
+            }`}>
+              {filteredTemplates.map((template) => (
+                <TemplateCard key={template.id} template={template} />
+              ))}
+            </div>
+          )}
 
-          {filteredTemplates.length === 0 && (
+          {!loading && !error && filteredTemplates.length === 0 && (
             <div className="text-center py-12">
               <div className="text-gray-400 text-6xl mb-4">🎨</div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
