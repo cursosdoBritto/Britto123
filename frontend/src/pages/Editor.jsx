@@ -385,7 +385,7 @@ const Editor = () => {
                 onChange={(e) => updateElement(selectedElement.id, { fontFamily: e.target.value })}
                 className="w-full mt-1 border border-gray-300 rounded-md px-3 py-2"
               >
-                {mockFonts.map(font => (
+                {FONTS.map(font => (
                   <option key={font} value={font}>{font}</option>
                 ))}
               </select>
